@@ -1,23 +1,18 @@
 import express from 'express';
 import {
-  criar,
   listar,
-  buscarPorId,
+  criar,
   atualizar,
   deletar,
-  listarPorAlunoId,
-  listarPorProfessorId,
-} from '../controllers/fichaTreinoController.js';
+  buscarPorId,
+} from '../controllers/usuarioController.js';
 
 const router = express.Router();
 
-router.post('/', criar);
 router.get('/', listar);
 router.get('/:id', buscarPorId);
+router.post('/', criar);
 router.put('/:id', atualizar);
 router.delete('/:id', deletar);
-
-router.get('/aluno/:alunoId', listarPorAlunoId);
-router.get('/professor/:professorId', listarPorProfessorId);
 
 export default router;
