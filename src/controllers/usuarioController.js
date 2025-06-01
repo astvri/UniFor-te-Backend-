@@ -1,4 +1,15 @@
+
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken';
+
 import * as usuarioService from '../services/usuarioService.js';
+
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
+
 
 export const listar = async (req, res) => {
   const { data, error } = await usuarioService.listarUsuarios();
@@ -17,6 +28,52 @@ export const criar = async (req, res) => {
       res.status(400).json({ error: err.message });
     }
   };
+
+  export const login = async (req, res) => {
+  const { email, senha } = req.body;
+
+  if (!email || !senha) {
+    return res.status(400).json({ error: 'Email e senha são obrigatórios.' });
+  }
+
+  try {
+    const { data: user, error: findError } = await supabase
+      .from('usuarios') 
+      .select('*') 
+      .eq('email', email)
+      .single();
+
+   
+    if (findError) {
+        if (findError.code === 'PGRST116') {
+            return res.status(401).json({ error: 'Credenciais inválidas.' }); // Email não encontrado
+        }
+        console.error('Erro ao buscar utilizador:', findError);
+        return res.status(500).json({ error: 'Erro ao tentar fazer login.' });
+    }
+
+    const senhaValida = await bcrypt.compare(senha, user.senha);
+    if (!senhaValida) {
+      return res.status(401).json({ error: 'Credenciais inválidas.' }); // Senha incorreta
+    }
+
+    
+    const secretKey = process.env.JWT_SECRET || 'sua_chave_secreta_padrao_insegura';
+    const tokenPayload = {
+      id: user.id,
+      email: user.email,
+    };
+    const token = jwt.sign(tokenPayload, secretKey, { expiresIn: '1h' }); 
+
+    delete user.senha;
+
+    res.status(200).json({ token, user });
+
+  } catch (error) {
+    console.error('Erro no servidor durante o login:', error);
+    res.status(500).json({ error: 'Erro interno do servidor.' });
+  }
+};
   
 
 export const atualizar = async (req, res) => {
