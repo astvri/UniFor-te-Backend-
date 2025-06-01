@@ -19,7 +19,7 @@ export const listar = async (req, res) => {
 
 export const criar = async (req, res) => {
     try {
-      console.log("BODY recebido:", req.body); // 🕵️ Verifique isso no console
+      console.log("BODY recebido:", req.body); 
   
       const { data, error } = await usuarioService.criarUsuario(req.body);
       if (error) return res.status(500).json({ error: error.message });

@@ -14,46 +14,63 @@ export const listarUsuarios = async () => {
 
 // Criar um novo usuário
 export const criarUsuario = async (dados) => {
-  console.log('dados recebidos no service:', dados);
+    console.log('dados recebidos no service (criar):', dados);
+    try {
+      const saltRounds = 10;
+      const senhaEncriptada = await bcrypt.hash(dados.senha, saltRounds);
+
+      const usuarioParaInserir = {
+        nome: dados.nome, 
+        cpf: dados.cpf,
+        email: dados.email,
+        senha: senhaEncriptada
+      };
+      
+      const { data, error } = await supabase
+        .from('usuarios')
+        .insert([usuarioParaInserir])
+        .select(); 
+
+      if (data && data.length > 0) {
+        delete data[0].senha;
+      }
+
+      return { data, error };
+    } catch (err) {
+      console.error('Erro ao criar usuário:', err);
+      return { data: null, error: err };
+    }
+  };
+
+// Atualizar um usuário por ID (com campo nome)
+export const atualizarUsuario = async (id, dados) => {
+  console.log('dados recebidos no service (atualizar):', id, dados);
   try {
-    const saltRounds = 10; 
-    const senhaEncriptada = await bcrypt.hash(dados.senha, saltRounds);
-
-    const usuario = new Usuario({ ...dados, senha: senhaEncriptada }); 
-
-    const { data, error } = await supabase.from('usuarios').insert([usuario]).select(); // Adicione .select() para retornar os dados inseridos
-
-    if (data && data.length > 0) {
-      delete data[0].senha;
+    const dadosParaAtualizar = {};
+    if (dados.nome) dadosParaAtualizar.nome = dados.nome;
+    if (dados.cpf) dadosParaAtualizar.cpf = dados.cpf;
+    if (dados.email) dadosParaAtualizar.email = dados.email;
+    
+    if (Object.keys(dadosParaAtualizar).length === 0) {
+        return { data: null, error: { message: "Nenhum dado fornecido para atualização." } };
     }
 
-    return { data, error };
-  } catch (err) {
-    console.error('Erro ao criar usuário:', err);
-    return { data: null, error: err };
-  }
-};
-
-  
-
-// Atualizar um usuário por ID
-export const atualizarUsuario = async (id, dados) => {
-  try {
-    const usuario = new Usuario({ id, ...dados });
     const { data, error } = await supabase
       .from('usuarios')
-      .update({
-        cpf: usuario.cpf,
-        email: usuario.email,
-        senha: usuario.senha,
-      })
-      .eq('id', id);
+      .update(dadosParaAtualizar)
+      .eq('id', id)
+      .select(); 
+  
+     if (data && data.length > 0 && data[0].senha) {
+        delete data[0].senha;
+      }
+
     return { data, error };
   } catch (err) {
+    console.error('Erro ao atualizar usuário:', err);
     return { data: null, error: err };
   }
 };
-
 // Deletar um usuário por ID
 export const deletarUsuario = async (id) => {
   try {
