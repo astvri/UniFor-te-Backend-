@@ -1,4 +1,3 @@
-
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
 
@@ -58,7 +57,7 @@ export const criar = async (req, res) => {
     }
 
     
-    const secretKey = process.env.JWT_SECRET || 'sua_chave_secreta_padrao_insegura';
+    const secretKey = process.env.JWT_SECRET;
     const tokenPayload = {
       id: user.id,
       email: user.email,
@@ -81,7 +80,12 @@ export const atualizar = async (req, res) => {
   try {
     const { data, error } = await usuarioService.atualizarUsuario(id, req.body);
     if (error) return res.status(500).json({ error: error.message });
-    res.json(data);
+    
+    if (data) {
+      res.json(data); 
+    } else {
+      res.status(404).json({ error: 'Usuário não encontrado ou não foi possível atualizar' });
+    }
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

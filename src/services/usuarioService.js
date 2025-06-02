@@ -42,7 +42,7 @@ export const criarUsuario = async (dados) => {
     }
   };
 
-// Atualizar um usuário por ID (com campo nome)
+// Atualizar um usuário por ID
 export const atualizarUsuario = async (id, dados) => {
   console.log('dados recebidos no service (atualizar):', id, dados);
   try {
@@ -63,16 +63,21 @@ export const atualizarUsuario = async (id, dados) => {
       .eq('id', id)
       .select(); 
   
-     if (data && data.length > 0 && data[0].senha) {
-        delete data[0].senha;
+    let responseData = null;
+    if (data && data.length > 0) {
+      responseData = data[0];  
+      if (responseData.senha) {
+        delete responseData.senha;
       }
+    }
 
-    return { data, error };
+    return { data: responseData, error };
   } catch (err) {
     console.error('Erro ao atualizar usuário:', err);
     return { data: null, error: err };
   }
 };
+
 // Deletar um usuário por ID
 export const deletarUsuario = async (id) => {
   try {
