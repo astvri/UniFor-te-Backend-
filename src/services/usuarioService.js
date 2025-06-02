@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import supabase from '../supabase/supabaseClient.js';
 import Usuario from '../entities/Usuario.js';
 
@@ -13,31 +14,66 @@ export const listarUsuarios = async () => {
 
 // Criar um novo usuário
 export const criarUsuario = async (dados) => {
-    console.log('dados recebidos no service:', dados);  // <-- aqui
+    console.log('dados recebidos no service (criar):', dados);
     try {
-      const usuario = new Usuario(dados);
-      const { data, error } = await supabase.from('usuarios').insert([usuario]);
+      const saltRounds = 10;
+      const senhaEncriptada = await bcrypt.hash(dados.senha, saltRounds);
+
+      const usuarioParaInserir = {
+        nome: dados.nome, 
+        cpf: dados.cpf,
+        email: dados.email,
+        senha: senhaEncriptada
+      };
+      
+      const { data, error } = await supabase
+        .from('usuarios')
+        .insert([usuarioParaInserir])
+        .select(); 
+
+      if (data && data.length > 0) {
+        delete data[0].senha;
+      }
+
       return { data, error };
     } catch (err) {
+      console.error('Erro ao criar usuário:', err);
       return { data: null, error: err };
     }
   };
-  
 
 // Atualizar um usuário por ID
 export const atualizarUsuario = async (id, dados) => {
+  console.log('dados recebidos no service (atualizar):', id, dados);
   try {
-    const usuario = new Usuario({ id, ...dados });
+    const dadosParaAtualizar = {};
+    if (dados.nome) dadosParaAtualizar.nome = dados.nome;
+    if (dados.cpf) dadosParaAtualizar.cpf = dados.cpf;
+    if (dados.email) dadosParaAtualizar.email = dados.email;
+    if (dados.telefone) dadosParaAtualizar.telefone = dados.telefone;
+    if (dados.endereco) dadosParaAtualizar.endereco = dados.endereco;
+    
+    if (Object.keys(dadosParaAtualizar).length === 0) {
+        return { data: null, error: { message: "Nenhum dado fornecido para atualização." } };
+    }
+
     const { data, error } = await supabase
       .from('usuarios')
-      .update({
-        cpf: usuario.cpf,
-        email: usuario.email,
-        senha: usuario.senha,
-      })
-      .eq('id', id);
-    return { data, error };
+      .update(dadosParaAtualizar)
+      .eq('id', id)
+      .select(); 
+  
+    let responseData = null;
+    if (data && data.length > 0) {
+      responseData = data[0];  
+      if (responseData.senha) {
+        delete responseData.senha;
+      }
+    }
+
+    return { data: responseData, error };
   } catch (err) {
+    console.error('Erro ao atualizar usuário:', err);
     return { data: null, error: err };
   }
 };

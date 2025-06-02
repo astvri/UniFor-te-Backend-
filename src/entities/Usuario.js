@@ -1,9 +1,12 @@
 export default class Usuario {
-    constructor({ cpf, email, senha }) {
+    constructor({ cpf, email, senha, telefone, endereco, nome }) {
     
       this.cpf = cpf;
       this.email = email;
       this.senha = senha;
+      this.telefone = telefone;
+      this.endereco = endereco;
+      this.nome = nome;
   
     }
   
