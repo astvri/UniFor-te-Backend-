@@ -50,6 +50,8 @@ export const atualizarUsuario = async (id, dados) => {
     if (dados.nome) dadosParaAtualizar.nome = dados.nome;
     if (dados.cpf) dadosParaAtualizar.cpf = dados.cpf;
     if (dados.email) dadosParaAtualizar.email = dados.email;
+    if (dados.telefone) dadosParaAtualizar.telefone = dados.telefone;
+    if (dados.endereco) dadosParaAtualizar.endereco = dados.endereco;
     
     if (Object.keys(dadosParaAtualizar).length === 0) {
         return { data: null, error: { message: "Nenhum dado fornecido para atualização." } };
