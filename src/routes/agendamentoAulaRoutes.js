@@ -1,19 +1,17 @@
 import express from 'express';
 import {
-  listar,
   criar,
-  atualizar,
-  deletar,
+  listar,
   buscarPorId,
-  listarPorProfessor
-} from '../controllers/aulaController.js';
+  atualizar,
+  deletar
+} from '../controllers/agendamentoAulaController.js';
 
 const router = express.Router();
 
-router.get('/', listar);
-router.get('/professor/:professor_id', listarPorProfessor);
-router.get('/:id', buscarPorId);
 router.post('/', criar);
+router.get('/', listar);
+router.get('/:id', buscarPorId);
 router.put('/:id', atualizar);
 router.delete('/:id', deletar);
 

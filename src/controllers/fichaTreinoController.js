@@ -1,62 +1,86 @@
 import * as fichaTreinoService from '../services/fichaTreinoService.js';
 
-
 export const criar = async (req, res) => {
   try {
     const fichaData = req.body;
-    if (!fichaData.titulo || !fichaData.descricao || !fichaData.exercicios) {
-      return res.status(400).json({ error: "Título, descrição e exercícios são obrigatórios." });
+    
+    // Validação dos campos obrigatórios
+    if (!fichaData.objetivo) {
+      return res.status(400).json({ error: "O objetivo da ficha de treino é obrigatório." });
     }
 
-    const { data, error } = await fichaTreinoService.createFichaTreino(fichaData);
-    if (error) return res.status(500).json({ error: error.message || "Erro ao criar ficha de treino." });
+    const novaFicha = await fichaTreinoService.criarFichaTreino(fichaData);
+    if (!novaFicha) {
+      return res.status(500).json({ error: "Erro ao criar ficha de treino." });
+    }
 
-    res.status(201).json(data);
+    res.status(201).json(novaFicha);
   } catch (err) {
     res.status(500).json({ error: err.message || "Erro interno do servidor." });
   }
 };
 
 export const listar = async (req, res) => {
-  const { data, error } = await fichaTreinoService.getAllFichasTreino();
-  if (error) return res.status(500).json({ error: error.message || "Erro ao buscar fichas de treino." });
-  res.json(data);
+  try {
+    const fichas = await fichaTreinoService.listarFichasTreino();
+    res.json(fichas);
+  } catch (err) {
+    res.status(500).json({ error: err.message || "Erro ao buscar fichas de treino." });
+  }
 };
 
 export const buscarPorId = async (req, res) => {
-  const { id } = req.params;
-  const { data, error } = await fichaTreinoService.getFichaTreinoById(id);
-  if (error) return res.status(500).json({ error: error.message || "Erro ao buscar ficha." });
-  if (!data) return res.status(404).json({ error: "Ficha de treino não encontrada." });
-  res.json(data);
+  try {
+    const { id } = req.params;
+    const ficha = await fichaTreinoService.buscarFichaTreinoPorId(id);
+    
+    if (!ficha) {
+      return res.status(404).json({ error: "Ficha de treino não encontrada." });
+    }
+    
+    res.json(ficha);
+  } catch (err) {
+    res.status(500).json({ error: err.message || "Erro ao buscar ficha de treino." });
+  }
 };
 
 export const atualizar = async (req, res) => {
-  const { id } = req.params;
   try {
-    const { data, error } = await fichaTreinoService.updateFichaTreino(id, req.body);
-    if (error) return res.status(500).json({ error: error.message || "Erro ao atualizar ficha de treino." });
-    if (!data) {
-      // Verifica se existe antes de retornar erro genérico
-      const { data: exists } = await fichaTreinoService.getFichaTreinoById(id);
-      if (!exists) return res.status(404).json({ error: "Ficha de treino não encontrada para atualização." });
+    const { id } = req.params;
+    const updateData = req.body;
+
+    // Verifica se a ficha existe antes de atualizar
+    const fichaExistente = await fichaTreinoService.buscarFichaTreinoPorId(id);
+    if (!fichaExistente) {
+      return res.status(404).json({ error: "Ficha de treino não encontrada para atualização." });
+    }
+
+    const fichaAtualizada = await fichaTreinoService.atualizarFichaTreino(id, updateData);
+    if (!fichaAtualizada) {
       return res.status(500).json({ error: "Erro ao atualizar ficha de treino." });
     }
-    res.json(data);
+
+    res.json(fichaAtualizada);
   } catch (err) {
     res.status(500).json({ error: err.message || "Erro interno do servidor." });
   }
 };
 
 export const deletar = async (req, res) => {
-  const { id } = req.params;
   try {
-    const { data: exists, error: errExist } = await fichaTreinoService.getFichaTreinoById(id);
-    if (errExist) return res.status(500).json({ error: errExist.message || "Erro ao verificar ficha." });
-    if (!exists) return res.status(404).json({ error: "Ficha de treino não encontrada para exclusão." });
+    const { id } = req.params;
 
-    const { error } = await fichaTreinoService.deleteFichaTreino(id);
-    if (error) return res.status(500).json({ error: error.message || "Erro ao deletar ficha de treino." });
+    // Verifica se a ficha existe antes de deletar
+    const fichaExistente = await fichaTreinoService.buscarFichaTreinoPorId(id);
+    if (!fichaExistente) {
+      return res.status(404).json({ error: "Ficha de treino não encontrada para exclusão." });
+    }
+
+    const deletado = await fichaTreinoService.deletarFichaTreino(id);
+    if (!deletado) {
+      return res.status(500).json({ error: "Erro ao deletar ficha de treino." });
+    }
+
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ error: err.message || "Erro interno do servidor." });
@@ -66,15 +90,21 @@ export const deletar = async (req, res) => {
 // Métodos adicionais para filtros
 
 export const listarPorAlunoId = async (req, res) => {
-  const { alunoId } = req.params;
-  const { data, error } = await fichaTreinoService.getFichasTreinoByAlunoId(alunoId);
-  if (error) return res.status(500).json({ error: error.message || "Erro ao buscar fichas por aluno." });
-  res.json(data);
+  try {
+    const { alunoId } = req.params;
+    const fichas = await fichaTreinoService.listarFichasTreinoPorAlunoId(alunoId);
+    res.json(fichas);
+  } catch (err) {
+    res.status(500).json({ error: err.message || "Erro ao buscar fichas por aluno." });
+  }
 };
 
 export const listarPorProfessorId = async (req, res) => {
-  const { professorId } = req.params;
-  const { data, error } = await fichaTreinoService.getFichasTreinoByProfessorId(professorId);
-  if (error) return res.status(500).json({ error: error.message || "Erro ao buscar fichas por professor." });
-  res.json(data);
+  try {
+    const { professorId } = req.params;
+    const fichas = await fichaTreinoService.listarFichasTreinoPorProfessorId(professorId);
+    res.json(fichas);
+  } catch (err) {
+    res.status(500).json({ error: err.message || "Erro ao buscar fichas por professor." });
+  }
 };

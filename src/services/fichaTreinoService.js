@@ -4,15 +4,13 @@ import FichaTreino from '../entities/FichaTreino.js';
 const TABLE_NAME = 'fichas_treino';
 
 export const criarFichaTreino = async (fichaData) => {
-  const { titulo, descricao, exercicios, alunoId, professorId } = fichaData;
+  const { objetivo, alunoId, professorId } = fichaData;
 
   const { data, error } = await supabase
     .from(TABLE_NAME)
     .insert([
       {
-        titulo,
-        descricao,
-        exercicios,
+        objetivo,
         aluno_id: alunoId,
         professor_id: professorId,
       },
@@ -26,15 +24,13 @@ export const criarFichaTreino = async (fichaData) => {
   }
 
   if (data) {
-    return new FichaTreino(
-      data.id,
-      data.titulo,
-      data.descricao,
-      data.exercicios,
-      data.aluno_id,
-      data.professor_id,
-      data.created_at
-    );
+    return new FichaTreino({
+      id: data.id,
+      alunoId: data.aluno_id,
+      professorId: data.professor_id,
+      dataCriacao: data.data_criacao,
+      objetivo: data.objetivo
+    });
   }
 
   return null;
@@ -48,17 +44,14 @@ export const listarFichasTreino = async () => {
     return [];
   }
 
-  return data.map(
-    (f) =>
-      new FichaTreino(
-        f.id,
-        f.titulo,
-        f.descricao,
-        f.exercicios,
-        f.aluno_id,
-        f.professor_id,
-        f.created_at
-      )
+  return data.map(f => 
+    new FichaTreino({
+      id: f.id,
+      alunoId: f.aluno_id,
+      professorId: f.professor_id,
+      dataCriacao: f.data_criacao,
+      objetivo: f.objetivo
+    })
   );
 };
 
@@ -75,15 +68,13 @@ export const buscarFichaTreinoPorId = async (id) => {
   }
 
   if (data) {
-    return new FichaTreino(
-      data.id,
-      data.titulo,
-      data.descricao,
-      data.exercicios,
-      data.aluno_id,
-      data.professor_id,
-      data.created_at
-    );
+    return new FichaTreino({
+      id: data.id,
+      alunoId: data.aluno_id,
+      professorId: data.professor_id,
+      dataCriacao: data.data_criacao,
+      objetivo: data.objetivo
+    });
   }
 
   return null;
@@ -91,15 +82,9 @@ export const buscarFichaTreinoPorId = async (id) => {
 
 export const atualizarFichaTreino = async (id, updateData) => {
   const updatePayload = {};
-  if (updateData.titulo !== undefined) updatePayload.titulo = updateData.titulo;
-  if (updateData.descricao !== undefined)
-    updatePayload.descricao = updateData.descricao;
-  if (updateData.exercicios !== undefined)
-    updatePayload.exercicios = updateData.exercicios;
-  if (updateData.alunoId !== undefined)
-    updatePayload.aluno_id = updateData.alunoId;
-  if (updateData.professorId !== undefined)
-    updatePayload.professor_id = updateData.professorId;
+  if (updateData.objetivo !== undefined) updatePayload.objetivo = updateData.objetivo;
+  if (updateData.alunoId !== undefined) updatePayload.aluno_id = updateData.alunoId;
+  if (updateData.professorId !== undefined) updatePayload.professor_id = updateData.professorId;
 
   const { data, error } = await supabase
     .from(TABLE_NAME)
@@ -114,15 +99,13 @@ export const atualizarFichaTreino = async (id, updateData) => {
   }
 
   if (data) {
-    return new FichaTreino(
-      data.id,
-      data.titulo,
-      data.descricao,
-      data.exercicios,
-      data.aluno_id,
-      data.professor_id,
-      data.created_at
-    );
+    return new FichaTreino({
+      id: data.id,
+      alunoId: data.aluno_id,
+      professorId: data.professor_id,
+      dataCriacao: data.data_criacao,
+      objetivo: data.objetivo
+    });
   }
 
   return null;
@@ -146,24 +129,18 @@ export const listarFichasTreinoPorAlunoId = async (alunoId) => {
     .eq('aluno_id', alunoId);
 
   if (error) {
-    console.error(
-      'Erro ao buscar fichas de treino por aluno ID:',
-      error.message
-    );
+    console.error('Erro ao buscar fichas de treino por aluno ID:', error.message);
     return [];
   }
 
-  return data.map(
-    (f) =>
-      new FichaTreino(
-        f.id,
-        f.titulo,
-        f.descricao,
-        f.exercicios,
-        f.aluno_id,
-        f.professor_id,
-        f.created_at
-      )
+  return data.map(f => 
+    new FichaTreino({
+      id: f.id,
+      alunoId: f.aluno_id,
+      professorId: f.professor_id,
+      dataCriacao: f.data_criacao,
+      objetivo: f.objetivo
+    })
   );
 };
 
@@ -174,23 +151,17 @@ export const listarFichasTreinoPorProfessorId = async (professorId) => {
     .eq('professor_id', professorId);
 
   if (error) {
-    console.error(
-      'Erro ao buscar fichas de treino por professor ID:',
-      error.message
-    );
+    console.error('Erro ao buscar fichas de treino por professor ID:', error.message);
     return [];
   }
 
-  return data.map(
-    (f) =>
-      new FichaTreino(
-        f.id,
-        f.titulo,
-        f.descricao,
-        f.exercicios,
-        f.aluno_id,
-        f.professor_id,
-        f.created_at
-      )
+  return data.map(f => 
+    new FichaTreino({
+      id: f.id,
+      alunoId: f.aluno_id,
+      professorId: f.professor_id,
+      dataCriacao: f.data_criacao,
+      objetivo: f.objetivo
+    })
   );
 };

@@ -18,6 +18,9 @@ async function initializeApp() {
   const alunoRoutes = (await import('./routes/alunoRoutes.js')).default;
   const fichaTreinoRoutes = (await import('./routes/fichaTreinoRoutes.js')).default;
   const usuarioRoutes = (await import('./routes/usuarioRoutes.js')).default;
+  const aulaRoutes = (await import('./routes/aulaRoutes.js')).default;
+  const agendamentoAulaRoutes = (await import('./routes/agendamentoAulaRoutes.js')).default;
+  const exercicioFichaRoutes = (await import('./routes/exercicioFichaRoutes.js')).default;
 
 
   const app = express();
@@ -26,11 +29,13 @@ async function initializeApp() {
   app.use(express.json());
 
 // Rotas da API
-app.use('/api/professores', professorRoutes)
+app.use('/api/professores', professorRoutes);
 app.use('/api/alunos', alunoRoutes);
-app.use("/api/fichas", fichaTreinoRoutes);
+app.use('/api/fichas', fichaTreinoRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/aulas', aulaRoutes);
+app.use('/api/agendamentos', agendamentoAulaRoutes);
+app.use('/api/exercicios-ficha', exercicioFichaRoutes);
 
 
   // Middleware de erro global

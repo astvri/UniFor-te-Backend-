@@ -1,13 +1,15 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
+import supabase from '../supabase/supabaseClient.js';
+
 
 import * as usuarioService from '../services/usuarioService.js';
 
-import { createClient } from '@supabase/supabase-js'
+//import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
+//const supabaseUrl = process.env.SUPABASE_URL;
+//const supabaseKey = process.env.SUPABASE_ANON_KEY
+//const supabase = createClient(supabaseUrl, supabaseKey)
 
 
 export const listar = async (req, res) => {
