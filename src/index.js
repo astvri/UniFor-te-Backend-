@@ -25,11 +25,13 @@ async function initializeApp() {
   app.use(cors());
   app.use(express.json());
 
-  // Rotas da API
-  app.use('/api/professores', professorRoutes);
-  app.use('/api/alunos', alunoRoutes);
-  app.use('/api/fichas', fichaTreinoRoutes);
-  app.use('/api/usuarios', usuarioRoutes);
+// Rotas da API
+app.use('/api/professores', professorRoutes)
+app.use('/api/alunos', alunoRoutes);
+app.use("/api/fichas", fichaTreinoRoutes);
+app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/aulas', aulaRoutes);
+
 
   // Middleware de erro global
   app.use((err, req, res, next) => {
