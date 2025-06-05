@@ -1,12 +1,11 @@
+
 export default class ExercicioFicha {
-    constructor({ id, ficha_id, nome_exercicio, series, repeticoes, carga, observacoes }) {
-      this.id = id;
-      this.ficha_id = ficha_id;
-      this.nome_exercicio = nome_exercicio;
-      this.series = series;
-      this.repeticoes = repeticoes;
-      this.carga = carga;
-      this.observacoes = observacoes;
-    }
+  constructor({ id, nome_treino, descricao, professor_nome, exercicios }) {
+    this.id = id; 
+    this.nome_treino = nome_treino;
+    this.descricao = descricao;
+    this.professor_nome = professor_nome;
+    this.exercicios = exercicios || []; 
   }
-  
+}
+
