@@ -1,7 +1,7 @@
 import supabase from '../supabase/supabaseClient.js';
 import FichaTreino from '../entities/FichaTreino.js';
 
-const TABLE_NAME = 'fichas_treino';
+const TABLE_NAME = 'ficha_treino';
 
 export const criarFichaTreino = async (fichaData) => {
   const { objetivo, alunoId, professorId } = fichaData;
@@ -44,7 +44,7 @@ export const listarFichasTreino = async () => {
     return [];
   }
 
-  return data.map(f => 
+  return data.map(f =>
     new FichaTreino({
       id: f.id,
       alunoId: f.aluno_id,
@@ -125,7 +125,23 @@ export const deletarFichaTreino = async (id) => {
 export const listarFichasTreinoPorAlunoId = async (alunoId) => {
   const { data, error } = await supabase
     .from(TABLE_NAME)
-    .select('*')
+    .select(
+      `
+      *,
+      professor_data:professor(
+        id_usuario,
+        especialidade,
+        usuario:usuarios(id, nome)
+      ),
+      exercicios_relacionados:exercicio_ficha_exercicios(
+        series,
+        repeticoes,
+        carga,
+        observacoes,
+        exercicio:exercicios(id, nome, maquina)
+      )
+      `
+    )
     .eq('aluno_id', alunoId);
 
   if (error) {
@@ -133,15 +149,27 @@ export const listarFichasTreinoPorAlunoId = async (alunoId) => {
     return [];
   }
 
-  return data.map(f => 
-    new FichaTreino({
+  return data.map(f => {
+    const exerciciosMapeados = f.exercicios_relacionados ? f.exercicios_relacionados.map(rel => ({
+      id: rel.exercicio?.id,
+      nome: rel.exercicio?.nome,
+      maquina: rel.exercicio?.maquina,
+      series: rel.series,
+      repeticoes: rel.repeticoes,
+      carga: rel.carga,
+      observacoes: rel.observacoes
+    })) : [];
+
+    return new FichaTreino({
       id: f.id,
       alunoId: f.aluno_id,
       professorId: f.professor_id,
       dataCriacao: f.data_criacao,
-      objetivo: f.objetivo
-    })
-  );
+      objetivo: f.objetivo,
+      nomeProfessor: f.professor_data?.usuario?.nome || 'Não informado',
+      exercicios: exerciciosMapeados
+    });
+  });
 };
 
 export const listarFichasTreinoPorProfessorId = async (professorId) => {
@@ -155,7 +183,7 @@ export const listarFichasTreinoPorProfessorId = async (professorId) => {
     return [];
   }
 
-  return data.map(f => 
+  return data.map(f =>
     new FichaTreino({
       id: f.id,
       alunoId: f.aluno_id,

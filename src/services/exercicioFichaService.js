@@ -2,7 +2,6 @@
 import ExercicioFicha from '../entities/ExercicioFicha.js';
 import supabase from '../supabase/supabaseClient.js';
 
-//buscar exercicios detalhados por id
 const buscarExerciciosDetalhadosPorFichaId = async (fichaId) => {
   try {
     const { data: exerciciosRelacionados, error } = await supabase
@@ -127,8 +126,8 @@ export const buscarExercicioFichaPorId = async (id) => {
     const { data: ficha, error } = await supabase
       .from('exercicio_ficha')
       .select('*')
-      .eq('aluno_id', id) 
-      .single(); 
+      .eq('id', id)
+      .single(); // Usar single() para obter objeto ou erro se não for único
     
     if (error && error.code !== 'PGRST116') { 
         console.error(`[Service] Erro do Supabase ao buscar ficha ID ${id}:`, error);
@@ -139,8 +138,8 @@ export const buscarExercicioFichaPorId = async (id) => {
       return null;
     }
     
-    const exerciciosDetalhados = await buscarExerciciosDetalhadosPorFichaId(ficha.id);
-
+    const exerciciosDetalhados = await buscarExerciciosDetalhadosPorFichaId(id);
+    
     const fichaCompleta = new ExercicioFicha({ ...ficha, exercicios: exerciciosDetalhados });
     return fichaCompleta;
   } catch (error) {
