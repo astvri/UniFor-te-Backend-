@@ -21,6 +21,7 @@ async function initializeApp() {
   const aulaRoutes = (await import('./routes/aulaRoutes.js')).default;
   const agendamentoAulaRoutes = (await import('./routes/agendamentoAulaRoutes.js')).default;
   const exercicioFichaRoutes = (await import('./routes/exercicioFichaRoutes.js')).default;
+  const exercicios = (await import('./routes/exercicioRoutes.js')).default;
 
 
   const app = express();
@@ -36,6 +37,7 @@ app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/aulas', aulaRoutes);
 app.use('/api/agendamentos', agendamentoAulaRoutes);
 app.use('/api/exercicios-ficha', exercicioFichaRoutes);
+app.use('/api/exercicios', exercicios);
 
 
   // Middleware de erro global

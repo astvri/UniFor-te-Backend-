@@ -1,13 +1,7 @@
-import 'dotenv/config'; // Garante que o .env será carregado
 import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY; // aqui: SUPABASE_ANON_KEY conforme seu .env
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('SUPABASE_URL ou SUPABASE_ANON_KEY não definidos no .env');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 export default supabase;

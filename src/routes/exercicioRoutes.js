@@ -5,8 +5,8 @@ import {
   buscarPorId,
   atualizar,
   deletar,
-  listarPorProfessor,
-} from '../controllers/exercicioFichaController.js';
+  buscarPorNome,
+} from '../controllers/exerciciosController.js';
 
 const router = express.Router();
 
@@ -17,7 +17,8 @@ router.get('/:id', buscarPorId);
 router.put('/:id', atualizar);
 router.delete('/:id', deletar);
 
-// Rota para listar fichas por professor
-router.get('/professor/:professorNome', listarPorProfessor);
+// Rotas adicionais
+router.get('/nome/:nome', buscarPorNome);
 
 export default router;
+
