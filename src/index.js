@@ -20,7 +20,6 @@ async function initializeApp() {
   const usuarioRoutes = (await import('./routes/usuarioRoutes.js')).default;
   const aulaRoutes = (await import('./routes/aulaRoutes.js')).default;
   const agendamentoAulaRoutes = (await import('./routes/agendamentoAulaRoutes.js')).default;
-  const exercicioFichaRoutes = (await import('./routes/exercicioFichaRoutes.js')).default;
   const exercicios = (await import('./routes/exercicioRoutes.js')).default;
 
 
@@ -36,7 +35,7 @@ app.use('/api/fichas', fichaTreinoRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/aulas', aulaRoutes);
 app.use('/api/agendamentos', agendamentoAulaRoutes);
-app.use('/api/exercicios-ficha', exercicioFichaRoutes);
+
 app.use('/api/exercicios', exercicios);
 
 
