@@ -8,11 +8,13 @@ const aulaService = {
 
   criarAula: (dados) => {
     const aula = new Aula(dados);
-    return supabase.from('aula').insert([aula]);
-  },
+    const { id, ...dadosSemId } = aula; // remove o campo `id`
+    return supabase.from('aula').insert([dadosSemId]); // agora funciona
+  }, // <-- VÍRGULA FALTANDO AQUI
 
   atualizarAula: (id, dados) => {
     const aula = new Aula({ id, ...dados });
+
     return supabase
       .from('aula')
       .update({
@@ -22,7 +24,7 @@ const aulaService = {
         professor_id: aula.professor_id,
         data: aula.data
       })
-      .eq('id', id);
+      .eq('id', id); // usa o `id` corretamente
   },
 
   deletarAula: (id) => {

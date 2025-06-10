@@ -1,5 +1,5 @@
 export default class Usuario {
-    constructor({ cpf, email, senha, telefone, endereco, nome }) {
+    constructor({ cpf, email, senha, telefone, endereco, nome, tipo_usuario }) {
     
       this.cpf = cpf;
       this.email = email;
@@ -7,6 +7,7 @@ export default class Usuario {
       this.telefone = telefone;
       this.endereco = endereco;
       this.nome = nome;
+      this.tipo_usuario = tipo_usuario;
   
     }
   
@@ -29,4 +30,4 @@ export default class Usuario {
       // }
    //  }
   }
-  
+

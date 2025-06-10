@@ -23,7 +23,8 @@ export const criarUsuario = async (dados) => {
         nome: dados.nome, 
         cpf: dados.cpf,
         email: dados.email,
-        senha: senhaEncriptada
+        senha: senhaEncriptada,
+        tipo_usuario: dados.tipo_usuario // Adicionado tipo_usuario
       };
       
       const { data, error } = await supabase
@@ -31,11 +32,50 @@ export const criarUsuario = async (dados) => {
         .insert([usuarioParaInserir])
         .select(); 
 
-      if (data && data.length > 0) {
-        delete data[0].senha;
+      if (error) {
+        console.error('Erro ao inserir usuário:', error);
+        return { data: null, error: error };
       }
 
-      return { data, error };
+      if (data && data.length > 0) {
+        const novoUsuario = data[0];
+        delete novoUsuario.senha;
+
+        // Se o tipo de usuário for 'Professor', criar entrada na tabela 'professor'
+        if (novoUsuario.tipo_usuario === 'Professor') {
+          const { error: professorError } = await supabase
+            .from('professor')
+            .insert([
+              {
+                id_usuario: novoUsuario.id,
+                especialidade: 'Não informada' // Especialidade padrão
+              }
+            ]);
+          
+          if (professorError) {
+            console.error('Erro ao criar entrada na tabela professor:', professorError);
+            // Você pode decidir como lidar com este erro: 
+            // 1. Retornar um erro para o frontend (e talvez reverter a criação do usuário)
+            // 2. Apenas logar o erro e permitir que o usuário continue, mas sem a entrada de professor
+            // Por enquanto, vamos apenas logar e continuar.
+          }
+        } else if (novoUsuario.tipo_usuario === 'Aluno') { // Adicionado para Aluno
+          const { error: alunoError } = await supabase
+            .from('aluno')
+            .insert([
+              {
+                id_usuario: novoUsuario.id,
+                objetivo: 'Aguardando definição de objetivo' // Objetivo padrão para aluno
+              }
+            ]);
+          
+          if (alunoError) {
+            console.error('Erro ao criar entrada na tabela aluno:', alunoError);
+          }
+        }
+      }
+
+      return { data, error: null };
     } catch (err) {
       console.error('Erro ao criar usuário:', err);
       return { data: null, error: err };
@@ -52,6 +92,7 @@ export const atualizarUsuario = async (id, dados) => {
     if (dados.email) dadosParaAtualizar.email = dados.email;
     if (dados.telefone) dadosParaAtualizar.telefone = dados.telefone;
     if (dados.endereco) dadosParaAtualizar.endereco = dados.endereco;
+    if (dados.tipo_usuario) dadosParaAtualizar.tipo_usuario = dados.tipo_usuario; // Adicionado tipo_usuario
     
     if (Object.keys(dadosParaAtualizar).length === 0) {
         return { data: null, error: { message: "Nenhum dado fornecido para atualização." } };
@@ -97,3 +138,4 @@ export const buscarUsuarioPorId = async (id) => {
     return { data: null, error: err };
   }
 };
+

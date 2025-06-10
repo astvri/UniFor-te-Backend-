@@ -16,6 +16,7 @@ export const atualizarProfessor = (id_usuario, dados) => {
     .from('professor')
     .update({ especialidade: professor.especialidade })
     .eq('id_usuario', id_usuario);
+    
 };
 
 export const deletarProfessor = (id_usuario) => {
