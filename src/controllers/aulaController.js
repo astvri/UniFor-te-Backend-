@@ -106,3 +106,14 @@ export const listarPorProfessor = async (req, res) => {
     return res.status(400).json({ erro: erro.message });
   }
 };
+
+export const listarAulasComProfessor = async (req, res) => {
+  try {
+    const { data, error } = await aulaService.listarAulasComProfessor();
+    if (error) throw error;
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
