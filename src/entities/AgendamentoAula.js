@@ -1,9 +1,10 @@
 export default class AgendamentoAula {
-    constructor({ id, aluno_id, aula_id, status }) {
-      this.id = id;
-      this.aluno_id = aluno_id;
-      this.aula_id = aula_id;
-      this.status = status;
-    }
+  constructor({ aula_id, aluno_id, nome, descricao, data, horario }) {
+    this.aula_id = aula_id;
+    this.aluno_id = aluno_id;
+    this.nome = nome;
+    this.descricao = descricao;
+    this.data = data;
+    this.horario = horario;
   }
-  
+}
