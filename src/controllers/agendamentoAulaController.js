@@ -1,52 +1,45 @@
-import * as agendamentoService from '../services/agendamentoAulaService.js';
-
-export const criar = async (req, res) => {
-  const agendamento = req.body;
-
-  if (!agendamento.aluno_id || !agendamento.aula_id || !agendamento.status) {
-    return res.status(400).json({ error: 'aluno_id, aula_id e status são obrigatórios.' });
-  }
-
-  const { data, error } = await agendamentoService.criarAgendamento(agendamento);
-  if (error) return res.status(500).json({ error: error.message });
-
-  res.status(201).json(data);
-};
+import agendamentoAulaService from '../services/agendamentoAulaService.js';
 
 export const listar = async (req, res) => {
-  const { data, error } = await agendamentoService.listarAgendamentos();
-  if (error) return res.status(500).json({ error: error.message });
-
-  res.json(data);
+  try {
+    const { data, error } = await agendamentoAulaService.listarAgendamentos();
+    if (error) return res.status(400).json({ erro: error.message });
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(500).json({ erro: err.message });
+  }
 };
 
 export const buscarPorId = async (req, res) => {
   const { id } = req.params;
-  const { data, error } = await agendamentoService.buscarAgendamentoPorId(id);
-  if (error) return res.status(500).json({ error: error.message });
-  if (!data) return res.status(404).json({ error: 'Agendamento não encontrado.' });
-
-  res.json(data);
+  const { data, error } = await agendamentoAulaService.buscarPorId(id);
+  if (error || !data) return res.status(404).json({ erro: 'Agendamento não encontrado' });
+  return res.status(200).json(data);
 };
 
-export const atualizar = async (req, res) => {
-  const { id } = req.params;
-  const { data: exists } = await agendamentoService.buscarAgendamentoPorId(id);
-  if (!exists) return res.status(404).json({ error: 'Agendamento não encontrado.' });
+export const listarPorAluno = async (req, res) => {
+  const { aluno_id } = req.params;
+  const { data, error } = await agendamentoAulaService.listarPorAluno(aluno_id);
+  if (error) return res.status(400).json({ erro: error.message });
+  return res.status(200).json(data);
+};
 
-  const { data, error } = await agendamentoService.atualizarAgendamento(id, req.body);
-  if (error) return res.status(500).json({ error: error.message });
+export const agendar = async (req, res) => {
+  const { aula_id, aluno_id } = req.body;
 
-  res.json(data);
+  if (!aula_id || !aluno_id) {
+    return res.status(400).json({ erro: 'aula_id e aluno_id são obrigatórios' });
+  }
+
+  const { data, error } = await agendamentoAulaService.agendarAula({ aula_id, aluno_id });
+  if (error) return res.status(400).json({ erro: error.message });
+
+  return res.status(201).json(data);
 };
 
 export const deletar = async (req, res) => {
   const { id } = req.params;
-  const { data: exists } = await agendamentoService.buscarAgendamentoPorId(id);
-  if (!exists) return res.status(404).json({ error: 'Agendamento não encontrado.' });
-
-  const { success, error } = await agendamentoService.deletarAgendamento(id);
-  if (error) return res.status(500).json({ error: error.message });
-
-  res.status(204).send();
+  const { error } = await agendamentoAulaService.deletarAgendamento(id);
+  if (error) return res.status(400).json({ erro: error.message });
+  return res.status(200).json({ mensagem: 'Agendamento deletado com sucesso' });
 };

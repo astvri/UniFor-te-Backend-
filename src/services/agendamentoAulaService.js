@@ -1,86 +1,43 @@
 import supabase from '../supabase/supabaseClient.js';
 import AgendamentoAula from '../entities/AgendamentoAula.js';
 
-const TABLE_NAME = 'agendamento_aula';
+const agendamentoAulaService = {
+  listarAgendamentos: () => {
+    return supabase.from('agendamento_aula').select('*');
+  },
 
-export const criarAgendamento = async (agendamentoData) => {
-  const { aluno_id, aula_id, status } = agendamentoData;
+  buscarPorId: (id) => {
+    return supabase.from('agendamento_aula').select('*').eq('id', id).single();
+  },
 
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .insert([{ aluno_id, aula_id, status }])
-    .select()
-    .single();
+  listarPorAluno: (aluno_id) => {
+    return supabase.from('agendamento_aula').select('*').eq('aluno_id', aluno_id);
+  },
 
-  if (error) {
-    console.error('Erro ao criar agendamento:', error.message);
-    return { data: null, error };
+  agendarAula: async ({ aula_id, aluno_id }) => {
+    const { data: aula, error: erroAula } = await supabase
+      .from('aula')
+      .select('nome, descricao, data, horario')
+      .eq('id', aula_id)
+      .single();
+
+    if (erroAula) return { error: erroAula };
+
+    const agendamento = new AgendamentoAula({
+      aula_id,
+      aluno_id,
+      nome: aula.nome,
+      descricao: aula.descricao,
+      data: aula.data,
+      horario: aula.horario,
+    });
+
+    return supabase.from('agendamento_aula').insert([agendamento]);
+  },
+
+  deletarAgendamento: (id) => {
+    return supabase.from('agendamento_aula').delete().eq('id', id);
   }
-
-  return {
-    data: new AgendamentoAula(data),
-    error: null,
-  };
 };
 
-export const listarAgendamentos = async () => {
-  const { data, error } = await supabase.from(TABLE_NAME).select('*');
-
-  if (error) {
-    console.error('Erro ao listar agendamentos:', error.message);
-    return { data: [], error };
-  }
-
-  return {
-    data: data.map((a) => new AgendamentoAula(a)),
-    error: null,
-  };
-};
-
-export const buscarAgendamentoPorId = async (id) => {
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) {
-    console.error('Erro ao buscar agendamento:', error.message);
-    return { data: null, error };
-  }
-
-  return {
-    data: new AgendamentoAula(data),
-    error: null,
-  };
-};
-
-export const atualizarAgendamento = async (id, updateData) => {
-  const { data, error } = await supabase
-    .from(TABLE_NAME)
-    .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Erro ao atualizar agendamento:', error.message);
-    return { data: null, error };
-  }
-
-  return {
-    data: new AgendamentoAula(data),
-    error: null,
-  };
-};
-
-export const deletarAgendamento = async (id) => {
-  const { error } = await supabase.from(TABLE_NAME).delete().eq('id', id);
-
-  if (error) {
-    console.error('Erro ao deletar agendamento:', error.message);
-    return { success: false, error };
-  }
-
-  return { success: true, error: null };
-};
+export default agendamentoAulaService;
