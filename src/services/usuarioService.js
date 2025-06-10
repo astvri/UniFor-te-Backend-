@@ -23,7 +23,11 @@ export const criarUsuario = async (dados) => {
         nome: dados.nome, 
         cpf: dados.cpf,
         email: dados.email,
-        senha: senhaEncriptada
+        senha: senhaEncriptada,
+        telefone: dados.telefone,
+        endereco: dados.endereco,
+        titulo_objetivo: dados.titulo_objetivo,
+        descricao_objetivo: dados.descricao_objetivo,
       };
       
       const { data, error } = await supabase
@@ -52,6 +56,8 @@ export const atualizarUsuario = async (id, dados) => {
     if (dados.email) dadosParaAtualizar.email = dados.email;
     if (dados.telefone) dadosParaAtualizar.telefone = dados.telefone;
     if (dados.endereco) dadosParaAtualizar.endereco = dados.endereco;
+    if (dados.titulo_objetivo) dadosParaAtualizar.titulo_objetivo = dados.titulo_objetivo;
+    if (dados.descricao_objetivo) dadosParaAtualizar.descricao_objetivo = dados.descricao_objetivo;
     
     if (Object.keys(dadosParaAtualizar).length === 0) {
         return { data: null, error: { message: "Nenhum dado fornecido para atualização." } };

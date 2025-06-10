@@ -42,7 +42,13 @@ const aulaService = {
       .from('aula')
       .select('*')
       .eq('professor_id', professor_id);
-  }
-};
+  },
+
+  listarAulasComProfessor: () => {
+    return supabase
+      .from('aula')
+      .select('id, nome, descricao, horario, data, professor:professor_id(id_usuario, usuarios(nome))');
+  } 
+};  
 
 export default aulaService;

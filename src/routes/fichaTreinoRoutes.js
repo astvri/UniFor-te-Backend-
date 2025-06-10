@@ -11,14 +11,12 @@ import {
 
 const router = express.Router();
 
-// Rotas de filtro por relacionamentos (MAIS ESPECÍFICAS - devem vir primeiro)
 router.get('/aluno/:alunoId', listarPorAlunoId);
 router.get('/professor/:professorId', listarPorProfessorId);
 
-// Rotas principais CRUD (MAIS GENÉRICAS - devem vir depois)
 router.post('/', criar);
 router.get('/', listar);
-router.get('/:id', buscarPorId); // Esta rota agora será testada DEPOIS das rotas /aluno e /professor
+router.get('/:id', buscarPorId); 
 router.put('/:id', atualizar);
 router.delete('/:id', deletar);
 
